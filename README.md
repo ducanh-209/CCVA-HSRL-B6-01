@@ -30,7 +30,7 @@ CCVA-HSRL-B6-01
 ├── 📷 OpenMV/             # Chương trình xử lý ảnh cho OpenMV
 ├── 🖼️ Pictures/           # Hình ảnh robot (đủ 6 góc nhìn)
 └── 📘 README.md           # Tài liệu giới thiệu dự án
-'''
+```
 ### Mô tả các thư mục
 
 #### Libraries/`
