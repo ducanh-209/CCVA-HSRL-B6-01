@@ -1,29 +1,36 @@
-# Xe tự hành-bảng B6-WRO 2026
-Dự án xe tự hànhthực hiện nhiệm vụ di chuyển theo luật thi đấu bảng B6-WRO2026 với 2 vòng thi đấu Open Challange và Obstacle Challenge.
-# Giới thiệu
-Tên nhóm CCVA-HSLR-B6-01
+# 🏎️ Xe Tự Hành - Bảng B6 (WRO 2026)
 
-Nhóm gồm 3 thành viên: Vũ Nam Anh, Vũ Đức Anh, Nguyễn Lĩnh Hoàng Sơn
+> Dự án xe tự hành thực hiện nhiệm vụ di chuyển theo luật thi đấu **Bảng B6 - WRO 2026** với 2 vòng thi đấu: **Open Challenge** và **Obstacle Challenge**.
 
-Đơn vị đại diện: Hung Steam Robotics Lab-THPT Chu Văn An
+---
 
-## Cấu trúc thư mục
+## 👥 Giới Thiệu Nhóm
+
+* **Tên nhóm:** `CCVA-HSRL-B6-01`
+* **Đơn vị đại diện:** Hung Steam Robotics Lab - THPT Chu Văn An
+* **Thành viên nhóm:**
+  1. 👨‍💻 **Vũ Nam Anh**
+  2. 👨‍💻 **Vũ Đức Anh**
+  3. 👨‍💻 **Nguyễn Lĩnh Hoàng Sơn**
+
+---
+
+## 📁 Cấu Trúc Thư Mục
 
 Repository được tổ chức theo các thư mục chức năng nhằm thuận tiện cho việc cài đặt, phát triển và tham khảo tài liệu của dự án.
 
 ```text
 CCVA-HSRL-B6-01
 │
-├── Libraries/     # Thư viện sử dụng cho Arduino IDE    
-├── Sources/       # Mã nguồn chương trình điều khiển robot
-        ├── Osbtacle_Challenge/ # Mã vòng thử thách vượt chướng ngại vật
-        └── Open_Challenge/  # Mã vòng thử thách mở
-├── Instruction/           # Hướng dẫn cài đặt và sử dụng
-├── OpenMV/                # Chương trình xử lý ảnh cho OpenMV
-├── Pictures/              # Hình ảnh robot và các thành phần
-└── README.md              # Tài liệu giới thiệu dự án
-```
-
+├── 📦 Libraries/          # Thư viện tùy chỉnh cho Arduino IDE    
+├── 📜 Sources/            # Mã nguồn chương trình điều khiển robot
+│   ├── 🏁 Open_Challenge/     # Mã nguồn vòng thử thách mở
+│   └── 🚧 Obstacle_Challenge/ # Mã nguồn vòng thử thách vượt chướng ngại vật
+├── 📑 Instruction/        # Hướng dẫn cài đặt và sử dụng
+├── 📷 OpenMV/             # Chương trình xử lý ảnh cho OpenMV
+├── 🖼️ Pictures/           # Hình ảnh robot (đủ 6 góc nhìn)
+└── 📘 README.md           # Tài liệu giới thiệu dự án
+'''
 ### Mô tả các thư mục
 
 #### Libraries/`
