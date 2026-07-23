@@ -125,5 +125,22 @@ Chương trình được viết cho board điều khiển **Matrix Mini R4** (Ar
 | `WALL_THRESHOLD` | `180.0` | Ngưỡng khoảng cách nhận biết tường bên hông (mm). |
 
 ---
+---
 
-## 📋 Quy Trình Hoạt Động (Flow)ử nghiệm và hoạt động của hệ thống.
+## 🚀 Hướng Dẫn Sử Dụng & Thao Tác
+
+1. **Nạp Code:** Mở file trong Arduino IDE (đã cài đặt thư viện `MatrixMiniR4`) và tiến hành nạp vào board.
+2. **Khởi động:** Sau khi bật nguồn, robot ở trạng thái chờ lệnh bấm nút.
+3. **Thao tác Nút bấm:**
+   * **Nút DOWN (`BTN_DOWN`):** Chế độ Test/Debug Vision Sensor (vòng lặp đọc dữ liệu camera liên tục).
+   * **Nút UP (`BTN_UP`):** Bắt đầu cho robot chạy chương trình chính.
+
+---
+
+## 📌 Giải Thích Các Hàm Chính Trong Code
+
+* `servoMotor(float value, float l = 43)`: Điều chỉnh góc Servo bẻ lái, có giới hạn góc trong khoảng `[-l, l]`.
+* `bam_line_trai()` / `bam_line_phai()`: Sử dụng thuật toán PD (Proportional-Derivative) để duy trì khoảng cách bám tường theo Laser.
+* `turn()`: Tự động phát hiện khi chạm vạch góc sa bàn, thực hiện hành vi xoay đầu quét camera tìm khối màu tiếp theo.
+* `last_step()`: Chuỗi hành động trả lái và đi thẳng/nhập làn an toàn sau khi đã né xong một khối.
+* `line_counter()`: Đếm số vạch góc sa bàn robot đã đi qua để kiểm soát điều kiện dừng (`EXIT`).
