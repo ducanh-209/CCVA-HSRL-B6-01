@@ -1,94 +1,89 @@
-import sensor, image, time  # Import image sensor and time modules
-from matrix_mini import send_data  # Import the send_data function from the matrix_mini module
+import sensor, image, time
+from matrix_mini import send_data, uart, green_led
+import fill_light
 
-# Initialize the sensor
-sensor.reset()  # Reset the sensor
-sensor.set_pixformat(sensor.RGB565)  # Set the pixel format to RGB565
-sensor.set_framesize(sensor.QVGA)  # Set the image resolution to QVGA (320x240)
-sensor.skip_frames(time=2000)  # Wait for 2 seconds to stabilize the sensor
+# Khởi tạo cảm biến
+sensor.reset()
+sensor.set_pixformat(sensor.RGB565)
+sensor.set_framesize(sensor.QVGA)
+sensor.skip_frames(time=2000)
 
-# Set image flipping
-sensor.set_vflip(True)  # Vertically flip the image
-sensor.set_hmirror(True)  # Horizontally mirror the image
+sensor.set_vflip(True)
+sensor.set_hmirror(True)
 
-# Define color threshold range (HSV), suitable for detecting the target color
-# Hue, Saturation, and Value range
-threshold = [(35, 28, -11, -76, 19, -5), (27, 0, 127, 23, 127, -128)]  #green  #red
-clock = time.clock()  # Create a clock to calculate frames per second (FPS) of image processing
-hotspot1 = (-1, 0, 0, 0)  # Thong tin cua bien bao so 1
-hotspot2 = (-1, 0, 0, 0)  # Thong tin cua bien bao so 2
+fill_light.on()
 
-def tracking(index):
-    global hotspot1, hotspot2
-    blobs = img.find_blobs([threshold[index]], pixels_threshold=110, area_threshold=110)
+threshold_cube = [(26, 18, -128, -15, 127, -128),
+(26, 0, 39, 127, -128, 38),
+(33, 0, 33, 127, -128, 127),
+(30, 8, -128, -14, 127, -128)]
+clock = time.clock()
+cube_data = (-1, 0, 0, 0)
 
-    # if index == 2:
-    #     index = 0
 
-    # if index == 3:
-    #     index = 1
-
-    if blobs:  # If blobs are found
-
-        # Find the largest blob by area
-        max_blob = max(blobs, key=lambda b: b[2] * b[3])
-
-        img.draw_rectangle(max_blob.rect())  # Draw a rectangle around the largest blob
-
-        # Calculate the center coordinates of the blob
+def sense(cube_color):
+    global cube_data
+    if cube_color == 3:
+        blobs = img.find_blobs([threshold_cube[cube_color]], pixels_threshold=300, area_threshold=200)
+    elif cube_color == 2:
+        blobs = img.find_blobs([threshold_cube[cube_color]], pixels_threshold=600, area_threshold=200)
+    else:
+        blobs = img.find_blobs([threshold_cube[cube_color]], pixels_threshold=400, area_threshold=200)
+    if blobs:
+        max_blob = max(blobs, key=lambda b: b.cy())
+        img.draw_rectangle(max_blob.rect())
         x_center = max_blob.cx()
         y_center = max_blob.cy()
-
-        # Calculate the blob's area and round it to an integer
         blob_area = round(max_blob.area() / 2)
+        img.draw_cross(x_center, y_center)
+        img.draw_string(max_blob.x(), max_blob.y() - 15, f"C:{cube_color}, X:{x_center}, Y:{y_center}", color=(255, 255, 255))
+        if cube_color == 2:
+            cube_color = 1
+        if cube_color == 3:
+            cube_color = 0
+        if cube_data[2] <= y_center:
+            cube_data = (cube_color, x_center, y_center, blob_area)
 
-        # Mark the center point and coordinates text on the image
-        img.draw_cross(x_center, y_center)  # Draw a cross at the center
-        img.draw_string(max_blob.x(), max_blob.y() - 15, f"X:{x_center}, Y:{y_center}", color=(255, 255, 255))  # Display the coordinates
+# while True:
+#     fill_light.brightness(100)
+#     # Kiểm tra xem robot có gửi lệnh yêu cầu lấy dữ liệu không
+#             # CHỤP ẢNH NGAY TẠI THỜI ĐIỂM ROBOT YÊU CẦU
+#     img = sensor.snapshot()
 
-
-        if hotspot1 == (-1, 0, 0, 0):
-            hotspot1 = (index, x_center, y_center, blob_area)
-        elif hotspot2 == (-1, 0, 0, 0) and hotspot1[0] != index:
-            hotspot2 = (index, x_center, y_center, blob_area)
-        # print(hotspot1, hotspot2)
-        # send_data([hotspot1[0], hotspot1[1], hotspot1[2], hotspot1[3], hotspot2[0], hotspot2[1], hotspot2[2], hotspot2[3]])
+#     nearest_data = (-1, 0, 0, 0)
+#     finding(0)
+#     finding(1)
+#     finding(2)
+#     finding(3)
+#     # Gửi dữ liệu mới nhất về ngay lập tức
+#     if nearest_data != (-1, 0, 0, 0):
+#         send_data([nearest_data[0], nearest_data[1], nearest_data[2], nearest_data[3]])
+#     else:
+#         # Nếu không thấy vật thể, gửi gói dữ liệu trống để robot không bị đợi timeout
+#         send_data([255, 0, 0, 0])
 
 
 while True:
-    hotspot1 = (-1, 0, 0, 0)  # Thong tin cua bien bao so 1
-    hotspot2 = (-1, 0, 0, 0)  # Thong tin cua bien bao so 2
-    clock.tick()  # Start timing
-    img = sensor.snapshot()  # Capture an image
+    # Kiểm tra xem robot có gửi lệnh yêu cầu lấy dữ liệu không
+    if uart.any():
+        cmd = uart.read(1)  # Đọc 1 byte lệnh từ robot
+        if cmd == b'G':  # Nếu robot gửi đúng ký tự 'G'
+            clock.tick()
 
-    # print(clock.fps())  # Output the current FPS
+            # CHỤP ẢNH NGAY TẠI THỜI ĐIỂM ROBOT YÊU CẦU
+            img = sensor.snapshot()
 
-    # Find blobs (color regions) in the image that match the threshold1
-    for i in (0, 1):
-        tracking(i)
-    TH = 0
-    if hotspot1[0] == 0 and hotspot2[0] == -1:  # th xanh
-        TH = 1
-    elif hotspot1[0] == 1 and hotspot2[0] == -1:  # th do
-        TH = 2
-    elif hotspot2[0] != -1 and hotspot1[2] <= hotspot2[2]:  # do gan
-        if hotspot2[1] > 160 and hotspot1[1] > 160:
-            TH = 3
-        elif hotspot2[1] > 160 and hotspot1[1] < 160:
-            TH = 4
-        elif hotspot2[1] < 160 and hotspot1[1] > 160:
-            TH = 5
-        elif hotspot2[1] < 160 and hotspot1[1] < 160:
-            TH = 6
-    elif hotspot2[0] != -1 and hotspot1[2] > hotspot2[2]:  # xanh gan
-        if hotspot2[1] > 160 and hotspot1[1] > 160:
-            TH = 7
-        elif hotspot1[1] > 160 and hotspot2[1] < 160:
-            TH = 8
-        elif hotspot1[1] < 160 and hotspot2[1] > 160:
-            TH = 9
-        elif hotspot1[1] < 160 and hotspot2[1] < 160:
-            TH = 10
-    if TH != 0:
-        print(TH)
-        send_data ([TH])
+            cube_data = (-1, 0, 0, 0)
+            sense(0)
+            sense(1)
+            sense(2)
+            sense(3)
+            print(cube_data)
+            # Gửi dữ liệu mới nhất về ngay lập tức
+            if cube_data != (-1, 0, 0, 0):
+                send_data([cube_data[0], cube_data[1], cube_data[2], cube_data[3]])
+            else:
+                # Nếu không thấy vật thể, gửi gói dữ liệu trống để robot không bị đợi timeout
+                send_data([255, 0, 0, 0])
+        if cmd == b'L':
+            green_led.on()
